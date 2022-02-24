@@ -3118,7 +3118,6 @@ class GA:
         return value_from_space
 
     def best_solution(self, pop_fitness=None):
-
         """
         Returns information about the best solution found by the genetic algorithm.
         Accepts the following parameters:
@@ -3133,10 +3132,14 @@ class GA:
         # At first, the fitness is calculated for each solution in the final generation.
         if pop_fitness is None:
             pop_fitness = self.cal_pop_fitness()
+            
+        return self._best_solution(pop_fitness, self.population)
+        
+    def _best_solution(self, pop_fitness, population):
         # Then return the index of that solution corresponding to the best fitness.
         best_match_idx = numpy.where(pop_fitness == numpy.max(pop_fitness))[0][0]
 
-        best_solution = self.population[best_match_idx, :].copy()
+        best_solution = population[best_match_idx, :].copy()
         best_solution_fitness = pop_fitness[best_match_idx]
 
         return best_solution, best_solution_fitness, best_match_idx
