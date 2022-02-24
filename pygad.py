@@ -897,6 +897,7 @@ class GA:
 
         self.last_generation_fitness = None # A list holding the fitness values of all solutions in the last generation.
         self.last_generation_parents = None # A list holding the parents of the last generation.
+        self.last_generation_parents_indices = None # A list ....
         self.last_generation_offspring_crossover = None # A list holding the offspring after applying crossover in the last generation.
         self.last_generation_offspring_mutation = None # A list holding the offspring after applying mutation in the last generation.
         self.previous_generation_fitness = None # Holds the fitness values of one generation before the fitness values saved in the last_generation_fitness attribute. Added in PyGAD 2.26.2
@@ -1131,8 +1132,23 @@ class GA:
 
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population.copy()
-
+        
     def cal_pop_fitness(self):
+        if self.valid_parameters == False:
+            raise ValueError("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
+       
+        return self._cal_pop_fitness(self.population,
+                                     self.last_generation_parents,
+                                     self.last_generation_parents_indices,
+                                     self.previous_generation_fitness,
+                                     self.fitness_func)
+
+    @staticmethod
+    def _cal_pop_fitness(population, 
+                         last_generation_parents, 
+                         last_generation_parents_indices,
+                         previous_generation_fitness,
+                         fitness_func):
 
         """
         Calculating the fitness values of all solutions in the current population. 
@@ -1140,23 +1156,20 @@ class GA:
             -fitness: An array of the calculated fitness values.
         """
 
-        if self.valid_parameters == False:
-            raise ValueError("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
-
         pop_fitness = []
         # Calculating the fitness value of each solution in the current population.
-        for sol_idx, sol in enumerate(self.population):
+        for sol_idx, sol in enumerate(population):
 
             # Check if this solution is a parent from the previous generation and its fitness value is already calculated. If so, use the fitness value instead of calling the fitness function.
-            if (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
+            if (last_generation_parents is not None) and len(numpy.where(numpy.all(last_generation_parents == sol, axis=1))[0] > 0):
                 # Index of the parent in the parents array (self.last_generation_parents). This is not its index within the population.
-                parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
+                parent_idx = numpy.where(numpy.all(last_generation_parents == sol, axis=1))[0][0]
                 # Index of the parent in the population.
-                parent_idx = self.last_generation_parents_indices[parent_idx]
+                parent_idx = last_generation_parents_indices[parent_idx]
                 # Use the parent's index to return its pre-calculated fitness value.
-                fitness = self.previous_generation_fitness[parent_idx]
+                fitness = previous_generation_fitness[parent_idx]
             else:
-                fitness = self.fitness_func(sol, sol_idx)
+                fitness = fitness_func(sol, sol_idx)
                 if type(fitness) in GA.supported_int_float_types:
                     pass
                 else:
