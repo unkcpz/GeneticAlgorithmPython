@@ -3165,7 +3165,6 @@ class GA:
                                  plot_type=plot_type,
                                  color=color,
                                  save_dir=save_dir)
-
     def plot_fitness(self, 
                     title="PyGAD - Generation vs. Fitness", 
                     xlabel="Generation", 
@@ -3191,20 +3190,58 @@ class GA:
 
         Returns the figure.
         """
+        return self._plot_fitness(self.generations_completed,
+                                  self.best_solutions_fitness,
+                    title="PyGAD - Generation vs. Fitness", 
+                    xlabel="Generation", 
+                    ylabel="Fitness", 
+                    linewidth=3, 
+                    font_size=14, 
+                    plot_type="plot",
+                    color="#3870FF",
+                    save_dir=None)
+        
+    @staticmethod
+    def _plot_fitness(generations_completed,
+                      best_solutions_fitness,
+                    title="PyGAD - Generation vs. Fitness", 
+                    xlabel="Generation", 
+                    ylabel="Fitness", 
+                    linewidth=3, 
+                    font_size=14, 
+                    plot_type="plot",
+                    color="#3870FF",
+                    save_dir=None):
 
-        if self.generations_completed < 1:
-            raise RuntimeError("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
+        """
+        Creates, shows, and returns a figure that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation. If no generation is completed, an exception is raised.
+
+        Accepts the following:
+            title: Figure title.
+            xlabel: Label on the X-axis.
+            ylabel: Label on the Y-axis.
+            linewidth: Line width of the plot. Defaults to 3.
+            font_size: Font size for the labels and title. Defaults to 14.
+            plot_type: Type of the plot which can be either "plot" (default), "scatter", or "bar".
+            color: Color of the plot which defaults to "#3870FF".
+            save_dir: Directory to save the figure.
+
+        Returns the figure.
+        """
+
+        if generations_completed < 1:
+            raise RuntimeError("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=generations_completed))
 
 #        if self.run_completed == False:
 #            if not self.suppress_warnings: warnings.warn("Warning calling the plot_result() method: \nGA is not executed yet and there are no results to display. Please call the run() method before calling the plot_result() method.\n")
 
         fig = matplotlib.pyplot.figure()
         if plot_type == "plot":
-            matplotlib.pyplot.plot(self.best_solutions_fitness, linewidth=linewidth, color=color)
+            matplotlib.pyplot.plot(best_solutions_fitness, linewidth=linewidth, color=color)
         elif plot_type == "scatter":
-            matplotlib.pyplot.scatter(range(self.generations_completed + 1), self.best_solutions_fitness, linewidth=linewidth, color=color)
+            matplotlib.pyplot.scatter(range(generations_completed + 1), best_solutions_fitness, linewidth=linewidth, color=color)
         elif plot_type == "bar":
-            matplotlib.pyplot.bar(range(self.generations_completed + 1), self.best_solutions_fitness, linewidth=linewidth, color=color)
+            matplotlib.pyplot.bar(range(generations_completed + 1), best_solutions_fitness, linewidth=linewidth, color=color)
         matplotlib.pyplot.title(title, fontsize=font_size)
         matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
         matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
